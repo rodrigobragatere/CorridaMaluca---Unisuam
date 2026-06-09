@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#05010f" />
+  <title>Tech Formula Race</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ============================================================= -->
+  <!-- CONTAINER PRINCIPAL DO JOGO                                   -->
+  <!-- ============================================================= -->
+  <div id="game-container">
+
+    <!-- Canvas de fundo da tela inicial (circuitos, bits, partículas) -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ========================================================= -->
+    <!-- TELA INICIAL                                              -->
+    <!-- ========================================================= -->
+    <section id="start-screen" class="screen active">
+      <div class="start-inner">
+        <img class="brand-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
+        <h1 class="logo">
+          <span class="logo-line">TECH</span>
+          <span class="logo-line accent">FORMULA</span>
+          <span class="logo-line">RACE</span>
+          <span class="logo-sub">// CIRCUITO DIGITAL 5:00 //</span>
+        </h1>
+
+        <form id="start-form" autocomplete="off">
+          <label for="player-name">Nome do Piloto</label>
+          <input id="player-name" type="text" maxlength="14" placeholder="Digite seu nome..." />
+          <button type="submit" id="start-btn" class="neon-btn">INICIAR CORRIDA</button>
+        </form>
+
+        <div class="instructions">
+          <h2>Controles</h2>
+          <div class="instructions-grid">
+            <div class="ctrl-block">
+              <h3>Desktop</h3>
+              <ul>
+                <li><kbd>&uarr;</kbd> Acelerar</li>
+                <li><kbd>&darr;</kbd> Frear / Ré</li>
+                <li><kbd>&larr;</kbd> Virar à esquerda</li>
+                <li><kbd>&rarr;</kbd> Virar à direita</li>
+                <li><kbd>F</kbd> Tela cheia · <kbd>M</kbd> Música</li>
+              </ul>
+            </div>
+            <div class="ctrl-block">
+              <h3>Mobile</h3>
+              <ul>
+                <li>Joystick virtual (canto esquerdo)</li>
+                <li>Botão NITRO (canto direito)</li>
+                <li>Acelera automaticamente ao mover</li>
+              </ul>
+            </div>
+            <div class="ctrl-block">
+              <h3>Controle (Gamepad)</h3>
+              <ul>
+                <li>Analógico esq. / D-pad: dirigir</li>
+                <li><kbd>RT</kbd> acelerar · <kbd>LT</kbd> frear</li>
+                <li><kbd>X</kbd>/<kbd>LB</kbd>/<kbd>RB</kbd> Nitro</li>
+                <li><kbd>A</kbd> / <kbd>Start</kbd> iniciar e confirmar</li>
+              </ul>
+            </div>
+          </div>
+          <p class="tip">A cada 30s o jogo pausa para uma pergunta de HTML. Acerte para liberar o NITRO!</p>
+        </div>
+
+        <p class="audio-hint">🔊 Toque/clique para habilitar o áudio futurista.</p>
+        <footer class="credits">feito por <span>@rodrigoBraga</span></footer>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TELA DE JOGO                                              -->
+    <!-- ========================================================= -->
+    <section id="game-screen" class="screen">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- HUD permanente -->
+      <div id="hud">
+        <div class="hud-row hud-top">
+          <img id="hud-logo" class="hud-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
+          <div class="hud-card">
+            <span class="hud-label">Piloto</span>
+            <span class="hud-value" id="hud-name">—</span>
+          </div>
+          <div class="hud-card">
+            <span class="hud-label">Posição</span>
+            <span class="hud-value" id="hud-position">1º / 10</span>
+          </div>
+          <div class="hud-card">
+            <span class="hud-label">Tempo</span>
+            <span class="hud-value" id="hud-time">05:00</span>
+          </div>
+          <div class="hud-card">
+            <span class="hud-label">Volta</span>
+            <span class="hud-value" id="hud-lap">1 / —</span>
+          </div>
+        </div>
+
+        <div class="hud-row hud-bottom">
+          <div class="hud-card">
+            <span class="hud-label">Pontuação</span>
+            <span class="hud-value" id="hud-score">0</span>
+          </div>
+          <div class="hud-card">
+            <span class="hud-label">Acertos</span>
+            <span class="hud-value" id="hud-correct">0</span>
+          </div>
+          <div class="hud-card">
+            <span class="hud-label">Melhor Volta</span>
+            <span class="hud-value" id="hud-bestlap">--:--</span>
+          </div>
+        </div>
+
+        <!-- Velocímetro + Nitro -->
+        <div id="speed-panel">
+          <div class="speed-meter">
+            <span class="hud-label">Velocidade</span>
+            <span class="hud-value" id="hud-speed">0</span><span class="kmh">km/h</span>
+          </div>
+          <div class="nitro-wrap">
+            <span class="hud-label">Nitro</span>
+            <div class="nitro-bar"><div id="nitro-fill"></div></div>
+            <span id="nitro-state">PRONTO</span>
+          </div>
+        </div>
+
+        <!-- Mensagens flutuantes (acerto/erro/eventos) -->
+        <div id="toast"></div>
+      </div>
+
+      <!-- Botões de controle de jogo (canto superior direito) -->
+      <div id="game-buttons">
+        <button id="btn-pause" class="icon-btn" title="Pausar (Esc)">⏸</button>
+        <button id="btn-music" class="icon-btn" title="Música (M)">♪</button>
+        <button id="btn-fullscreen" class="icon-btn" title="Tela cheia (F)">⛶</button>
+        <button id="btn-restart" class="icon-btn" title="Reiniciar">↻</button>
+      </div>
+
+      <!-- Controles touch para mobile -->
+      <div id="touch-controls">
+        <div id="joystick">
+          <div id="joystick-knob"></div>
+        </div>
+        <button id="nitro-btn">NITRO</button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- MODAL DE PERGUNTA                                         -->
+    <!-- ========================================================= -->
+    <div id="question-modal" class="modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-tag">// QUIZ HTML //</span>
+          <span class="modal-timer" id="q-timer">15</span>
+        </div>
+        <h2 id="q-text">Pergunta?</h2>
+        <div id="q-options"></div>
+        <p id="q-feedback"></p>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL DE PAUSE                                            -->
+    <!-- ========================================================= -->
+    <div id="pause-modal" class="modal">
+      <div class="modal-box pause-box">
+        <span class="modal-tag">// JOGO PAUSADO //</span>
+        <h2 id="pause-title">PAUSA</h2>
+        <div class="pause-buttons">
+          <button id="resume-btn" class="neon-btn">CONTINUAR</button>
+          <button id="pause-restart-btn" class="ghost-btn">Reiniciar Corrida</button>
+          <button id="exit-btn" class="ghost-btn">Sair para o Início</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- TELA FINAL + RANKING                                      -->
+    <!-- ========================================================= -->
+    <section id="end-screen" class="screen">
+      <div class="end-inner">
+        <img class="brand-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
+        <h1 class="end-title">CORRIDA FINALIZADA</h1>
+
+        <div class="result-grid">
+          <div class="result-card"><span>Piloto</span><b id="r-name">—</b></div>
+          <div class="result-card"><span>Posição Final</span><b id="r-position">—</b></div>
+          <div class="result-card"><span>Tempo Total</span><b id="r-time">—</b></div>
+          <div class="result-card"><span>Pontuação</span><b id="r-score">—</b></div>
+          <div class="result-card"><span>Acertos</span><b id="r-correct">—</b></div>
+          <div class="result-card"><span>Melhor Volta</span><b id="r-bestlap">—</b></div>
+        </div>
+
+        <div class="ranking">
+          <h2>🏆 RANKING GERAL</h2>
+          <p id="ranking-status" class="ranking-status">—</p>
+          <ol id="ranking-list"></ol>
+        </div>
+
+        <div class="end-buttons">
+          <button id="play-again-btn" class="neon-btn">CORRER NOVAMENTE</button>
+          <button id="clear-ranking-btn" class="ghost-btn">Limpar Ranking</button>
+        </div>
+        <footer class="credits">feito por <span>@rodrigoBraga</span></footer>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- SCRIPTS (ordem de dependência)                                -->
+  <!-- ============================================================= -->
+  <script src="js/questions.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ranking.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
