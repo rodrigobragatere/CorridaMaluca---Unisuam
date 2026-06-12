@@ -21,56 +21,74 @@
     <!-- ========================================================= -->
     <section id="start-screen" class="screen active">
       <div class="start-inner">
-        <img class="brand-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
-        <h1 class="logo">
-          <span class="logo-line">TECH</span>
-          <span class="logo-line accent">FORMULA</span>
-          <span class="logo-line">RACE</span>
-          <span class="logo-sub">// CIRCUITO DIGITAL 5:00 //</span>
-        </h1>
 
-        <form id="start-form" autocomplete="off">
-          <label for="player-name">Nome do Piloto</label>
-          <input id="player-name" type="text" maxlength="14" placeholder="Digite seu nome..." />
-          <button type="submit" id="start-btn" class="neon-btn">INICIAR CORRIDA</button>
-        </form>
+        <!-- Coluna principal: logo, formulário e Top 5 -->
+        <div class="start-col start-main">
+          <img class="brand-logo" src="assets/images/unisuam.png" alt="LPP" />
+          <h1 class="logo">
+            <span class="logo-line">TECH</span>
+            <span class="logo-line accent">FORMULA</span>
+            <span class="logo-line">RACE</span>
+            <span class="logo-sub">// CIRCUITO DIGITAL 5:00 //</span>
+          </h1>
 
-        <div class="instructions">
-          <h2>Controles</h2>
-          <div class="instructions-grid">
-            <div class="ctrl-block">
-              <h3>Desktop</h3>
-              <ul>
-                <li><kbd>&uarr;</kbd> Acelerar</li>
-                <li><kbd>&darr;</kbd> Frear / Ré</li>
-                <li><kbd>&larr;</kbd> Virar à esquerda</li>
-                <li><kbd>&rarr;</kbd> Virar à direita</li>
-                <li><kbd>F</kbd> Tela cheia · <kbd>M</kbd> Música</li>
-              </ul>
-            </div>
-            <div class="ctrl-block">
-              <h3>Mobile</h3>
-              <ul>
-                <li>Joystick virtual (canto esquerdo)</li>
-                <li>Botão NITRO (canto direito)</li>
-                <li>Acelera automaticamente ao mover</li>
-              </ul>
-            </div>
-            <div class="ctrl-block">
-              <h3>Controle (Gamepad)</h3>
-              <ul>
-                <li>Analógico esq. / D-pad: dirigir</li>
-                <li><kbd>RT</kbd> acelerar · <kbd>LT</kbd> frear</li>
-                <li><kbd>X</kbd>/<kbd>LB</kbd>/<kbd>RB</kbd> Nitro</li>
-                <li><kbd>A</kbd> / <kbd>Start</kbd> iniciar e confirmar</li>
-              </ul>
-            </div>
-          </div>
-          <p class="tip">A cada 30s o jogo pausa para uma pergunta de HTML. Acerte para liberar o NITRO!</p>
+          <form id="start-form" autocomplete="off">
+            <label for="player-name">Nome do Piloto</label>
+            <input id="player-name" type="text" maxlength="14" placeholder="Digite seu nome..." />
+            <button type="submit" id="start-btn" class="neon-btn">INICIAR CORRIDA</button>
+          </form>
         </div>
 
-        <p class="audio-hint">🔊 Toque/clique para habilitar o áudio futurista.</p>
-        <footer class="credits">feito por <span>@rodrigoBraga</span></footer>
+        <!-- Coluna lateral: instruções (vai para o lado em telas largas) -->
+        <div class="start-col start-info">
+          <div class="instructions">
+            <h2>Controles</h2>
+            <div class="instructions-grid">
+              <div class="ctrl-block">
+                <h3>Desktop</h3>
+                <ul>
+                  <li><kbd>&uarr;</kbd> Acelerar</li>
+                  <li><kbd>&darr;</kbd> Frear / Ré</li>
+                  <li><kbd>&larr;</kbd> Virar à esquerda</li>
+                  <li><kbd>&rarr;</kbd> Virar à direita</li>
+                  <li><kbd>F</kbd> Tela cheia · <kbd>M</kbd> Música</li>
+                </ul>
+              </div>
+              <div class="ctrl-block">
+                <h3>Mobile</h3>
+                <ul>
+                  <li>Joystick virtual (canto esquerdo)</li>
+                  <li>Botão NITRO (canto direito)</li>
+                  <li>Acelera automaticamente ao mover</li>
+                </ul>
+              </div>
+              <div class="ctrl-block">
+                <h3>Controle (Gamepad)</h3>
+                <ul>
+                  <li>Analógico esq. / D-pad: dirigir</li>
+                  <li><kbd>RT</kbd> acelerar · <kbd>LT</kbd> frear</li>
+                  <li><kbd>X</kbd>/<kbd>LB</kbd>/<kbd>RB</kbd> Nitro</li>
+                  <li><kbd>A</kbd> / <kbd>Start</kbd> iniciar e confirmar</li>
+                </ul>
+              </div>
+            </div>
+            <p class="tip">A cada 30s o jogo pausa para uma pergunta de HTML. Acerte para liberar o NITRO!</p>
+          </div>
+
+          <!-- Top 5 do ranking exibido abaixo dos controles -->
+          <div class="top5">
+            <h2>🏆 TOP 5 PILOTOS</h2>
+            <ol id="top5-list">
+              <li><span class="r-name">Carregando...</span></li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Rodapé ocupa a largura toda nas duas colunas -->
+        <div class="start-footer">
+          <p class="audio-hint">🔊 Toque/clique para habilitar o áudio futurista.</p>
+          <footer class="credits">feito por <span>@rodrigoBraga</span></footer>
+        </div>
       </div>
     </section>
 
@@ -83,7 +101,7 @@
       <!-- HUD permanente -->
       <div id="hud">
         <div class="hud-row hud-top">
-          <img id="hud-logo" class="hud-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
+          <img id="hud-logo" class="hud-logo" src="assets/images/unisuam.png" alt="LPP" />
           <div class="hud-card">
             <span class="hud-label">Piloto</span>
             <span class="hud-value" id="hud-name">—</span>
@@ -186,7 +204,7 @@
     <!-- ========================================================= -->
     <section id="end-screen" class="screen">
       <div class="end-inner">
-        <img class="brand-logo" src="assets/images/unisuam.png" alt="UNISUAM" />
+        <img class="brand-logo" src="assets/images/lpp.png" alt="LPP" />
         <h1 class="end-title">CORRIDA FINALIZADA</h1>
 
         <div class="result-grid">

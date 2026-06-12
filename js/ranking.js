@@ -6,15 +6,28 @@
      2) Sempre mantém um espelho local em LocalStorage como fallback
         (funciona offline / abrindo via file://).
    Ordenação:
-     1º critério: posição final obtida (menor é melhor)
-     2º critério: menor tempo total
-   Mantém apenas o TOP 10. Exposto como window.Ranking.
+     1º critério: maior pontuação (score)
+     2º critério: posição final obtida (menor é melhor)
+     3º critério: menor tempo total
+   Quem fizer mais pontos ultrapassa os demais no ranking, e a lista
+   permanece salva (LocalStorage / servidor). Mantém apenas o TOP 10.
+   Exposto como window.Ranking.
    ================================================================ */
 
 const Ranking = (() => {
   const KEY = "tech_formula_race_ranking_v1";
   const API = "/api/ranking";
   const MAX = 10;
+
+  /* ---------------- Dados iniciais (seed do Top 5) ---------------- */
+  // Registros padrão exibidos enquanto ninguém jogou ainda.
+  const SEED = [
+    { id: "seed-1", name: "Rodrigo",           position: 1, timeSec: 252, timeStr: "04:12", score: 1500, correct: 9, bestLap: 48 },
+    { id: "seed-2", name: "SpeedRacer",        position: 2, timeSec: 265, timeStr: "04:25", score: 1320, correct: 8, bestLap: 51 },
+    { id: "seed-3", name: "Penélope Charmosa", position: 3, timeSec: 278, timeStr: "04:38", score: 1180, correct: 7, bestLap: 53 },
+    { id: "seed-4", name: "DickVigarista",     position: 4, timeSec: 291, timeStr: "04:51", score: 950,  correct: 6, bestLap: 55 },
+    { id: "seed-5", name: "CComp",             position: 5, timeSec: 300, timeStr: "05:00", score: 820,  correct: 5, bestLap: 58 }
+  ];
 
   /* ---------------- LocalStorage (espelho/fallback) ---------------- */
   function loadLocal() {
@@ -28,8 +41,17 @@ const Ranking = (() => {
     try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
   }
 
+  // Semeia o ranking inicial apenas se nunca houve registro salvo
+  // (não recria após o jogador usar "Limpar Ranking").
+  try {
+    if (localStorage.getItem(KEY) === null) saveLocal(SEED);
+  } catch (e) {}
+
   function sortList(list) {
     return list.sort((a, b) => {
+      const scoreA = Number(a.score) || 0;
+      const scoreB = Number(b.score) || 0;
+      if (scoreA !== scoreB) return scoreB - scoreA;        // maior pontuação primeiro
       if (a.position !== b.position) return a.position - b.position;
       return a.timeSec - b.timeSec;
     });

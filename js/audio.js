@@ -1,6 +1,6 @@
 /* ================================================================
    audio.js — Áudio do jogo.
-   - MÚSICA de fundo: faixa MP3 (assets/audio/Unisuam.mp3) em loop,
+   - MÚSICA de fundo: faixa MP3 (assets/audio/unisuam.mp3) em loop,
      tocada na tela inicial e durante a corrida.
    - EFEITOS sintetizados via Web Audio API: motor contínuo, nitro,
      acerto, erro e chegada.
@@ -44,14 +44,14 @@ const GameAudio = (() => {
   }
 
   // -------------------- MÚSICA (faixa MP3 em loop) ----------------
-  // Música de fundo do jogo e da tela inicial: assets/audio/Unisuam.mp3.
+  // Música de fundo do jogo e da tela inicial: assets/audio/unisuam.mp3.
   let music = null;
   let musicLevel = 0.6; // nível relativo da música (0..1)
 
   // Cria o elemento de áudio (independe do AudioContext).
   function ensureMusic() {
     if (music) return;
-    music = new Audio("assets/audio/Unisuam.mp3");
+    music = new Audio("assets/audio/unisuam.mp3");
     music.loop = true;
     music.preload = "auto";
     music.volume = musicLevel * volume;
@@ -70,8 +70,24 @@ const GameAudio = (() => {
     ensureMusic();
     if (!musicOn || !music) return;
     music.volume = musicLevel * volume;
+    music.muted = false;
     const p = music.play();
-    if (p && typeof p.catch === "function") p.catch(() => {}); // ignora bloqueio de autoplay
+    if (p && typeof p.catch === "function") {
+      // Autoplay com som costuma ser bloqueado até haver um gesto do usuário.
+      // Fallback: inicia mudo (permitido pelos navegadores) e desmuta no 1º gesto,
+      // garantindo que a música já esteja tocando ao abrir o jogo.
+      p.catch(() => {
+        if (!musicOn || !music) return;
+        music.muted = true;
+        music.play().catch(() => {});
+        const unmute = () => {
+          if (music && musicOn) music.muted = false;
+        };
+        window.addEventListener("pointerdown", unmute, { once: true });
+        window.addEventListener("keydown", unmute, { once: true });
+        window.addEventListener("touchstart", unmute, { once: true });
+      });
+    }
   }
 
   function stopMusic() {

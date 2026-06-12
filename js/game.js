@@ -1181,12 +1181,32 @@
     }
   }
 
+  // Top 5 do ranking exibido na tela inicial.
+  function renderTop5() {
+    const ol = document.getElementById("top5-list");
+    if (!ol) return;
+    Ranking.getTop10().then(({ list }) => {
+      ol.innerHTML = "";
+      list.slice(0, 5).forEach(rec => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="r-name">${escapeHtml(rec.name)}</span>` +
+          `<span class="r-score">${rec.score != null ? Math.floor(rec.score) + " pts" : ""}</span>` +
+          `<span class="r-time">${escapeHtml(rec.timeStr || "")}</span>`;
+        ol.appendChild(li);
+      });
+      if (list.length === 0) {
+        ol.innerHTML = '<li><span class="r-name">Sem registros ainda</span></li>';
+      }
+    });
+  }
+
   /* ==============================================================
      TELAS / UTILIDADES
      ============================================================== */
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
+    if (id === "start-screen") renderTop5();
   }
 
   function setText(id, txt) {
@@ -1467,12 +1487,14 @@
     window.addEventListener("resize", resize);
     document.addEventListener("fullscreenchange", () => setTimeout(resize, 60));
 
-    // Habilita o áudio no primeiro gesto e já inicia a música na tela inicial.
+    // Inicia a música assim que o jogo abre. Navegadores costumam bloquear o
+    // autoplay com som, então o primeiro gesto do usuário serve de fallback.
     const enableAudio = () => {
       GameAudio.init();
       GameAudio.resume();
       GameAudio.startMusic(); // música de fundo já na tela principal
     };
+    enableAudio(); // tenta tocar imediatamente ao abrir
     window.addEventListener("pointerdown", enableAudio, { once: true });
     window.addEventListener("keydown", enableAudio, { once: true });
 
@@ -1504,8 +1526,12 @@
       Ranking.clear().then(() => {
         renderRanking([], -1);
         setRankingStatus("Ranking limpo.");
+        renderTop5();
       });
     });
+
+    // Top 5 na tela inicial (já ativa no carregamento da página).
+    renderTop5();
   }
 
   if (document.readyState === "loading") {

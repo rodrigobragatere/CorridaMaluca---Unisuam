@@ -77,6 +77,38 @@ html, body {
   backdrop-filter: blur(8px);
   box-shadow: 0 0 40px rgba(0, 240, 255, 0.18), inset 0 0 30px rgba(255, 0, 212, 0.06);
   text-align: center;
+
+  /* Layout em grade: 1 coluna (mobile/vertical), 2 colunas em telas largas */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 32px;
+}
+.start-footer { grid-column: 1 / -1; }
+
+/* Monitores e TVs (paisagem larga): coluna do logo/form à esquerda,
+   instruções à direita — aproveita melhor a tela horizontal. */
+@media (min-width: 980px) and (orientation: landscape) {
+  #start-screen.active { padding: 24px 32px; }
+  .start-inner {
+    width: min(1240px, 96%);
+    grid-template-columns: minmax(360px, 460px) 1fr;
+    align-items: start; /* alinha a coluna lateral na linha da logo */
+    padding: 30px 38px;
+  }
+  .start-info { text-align: left; }
+  .start-info .instructions { margin-top: 0; }
+  .start-info .top5 { margin-top: 16px; }
+  /* Blocos de controles empilhados na coluna lateral */
+  .instructions-grid { grid-template-columns: 1fr 1fr; }
+  .instructions-grid .ctrl-block:last-child { grid-column: 1 / -1; }
+  .logo-line { font-size: clamp(38px, 5vw, 64px); }
+}
+
+/* TVs muito largas: instruções voltam a ficar lado a lado em 3 colunas */
+@media (min-width: 1500px) and (orientation: landscape) {
+  .start-inner { width: min(1480px, 94%); }
+  .instructions-grid { grid-template-columns: repeat(3, 1fr); }
+  .instructions-grid .ctrl-block:last-child { grid-column: auto; }
 }
 
 .logo {
@@ -173,6 +205,29 @@ html, body {
 }
 .ghost-btn:hover { background: rgba(255, 0, 212, 0.12); }
 
+/* Top 5 na tela inicial */
+.top5 { text-align: left; margin-top: 18px; }
+.top5 h2 {
+  text-align: center; font-size: 15px; letter-spacing: 3px;
+  color: var(--neon-yellow); margin-bottom: 10px; text-transform: uppercase;
+}
+#top5-list { list-style: none; counter-reset: rank; }
+#top5-list li {
+  counter-increment: rank;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 8px 14px; margin-bottom: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  border-radius: 10px; font-size: 14px;
+}
+#top5-list li::before {
+  content: counter(rank) "º";
+  width: 32px; color: var(--neon-cyan); font-weight: 800;
+}
+#top5-list li .r-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#top5-list li .r-score { color: var(--neon-yellow); font-variant-numeric: tabular-nums; }
+#top5-list li .r-time { color: var(--neon-green); font-variant-numeric: tabular-nums; }
+
 /* Instruções */
 .instructions { text-align: left; margin-top: 6px; }
 .instructions h2 {
@@ -245,7 +300,7 @@ kbd {
 }
 /* Logo UNISUAM ao lado das contagens (HUD) */
 .hud-logo {
-  height: 46px;
+  height: 64px;
   align-self: center;
   padding: 5px 10px;
   background: rgba(245, 250, 255, 0.92);
@@ -257,7 +312,7 @@ kbd {
 
 /* Logo de marca nas telas inicial/final */
 .brand-logo {
-  height: 56px;
+  height: 96px;
   margin: 0 auto 14px;
   display: block;
   padding: 8px 16px;
@@ -500,8 +555,8 @@ body.touch #touch-controls {
   .hud-value { font-size: 15px; }
   .speed-meter .hud-value { font-size: 22px; }
   .start-inner, .end-inner { padding: 20px 16px; }
-  .hud-logo { height: 34px; padding: 3px 7px; }
-  .brand-logo { height: 44px; }
+  .hud-logo { height: 48px; padding: 3px 7px; }
+  .brand-logo { height: 72px; }
 }
 
 @media (max-height: 480px) and (orientation: landscape) {

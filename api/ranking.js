@@ -20,8 +20,20 @@
 const MAX = 10;
 const REDIS_KEY = "tfr:ranking";
 
+// Dados iniciais (mesmo seed do cliente): usados apenas quando o ranking
+// nunca foi gravado. Após "Limpar Ranking" (DELETE) a lista fica vazia
+// e NÃO é semeada de novo, pois passa a existir como "[]".
+const SEED = [
+  { id: "seed-1", name: "Rodrigo",           position: 1, timeSec: 252, timeStr: "04:12", score: 1500, correct: 9, bestLap: 48 },
+  { id: "seed-2", name: "SpeedRacer",        position: 2, timeSec: 265, timeStr: "04:25", score: 1320, correct: 8, bestLap: 51 },
+  { id: "seed-3", name: "Penélope Charmosa", position: 3, timeSec: 278, timeStr: "04:38", score: 1180, correct: 7, bestLap: 53 },
+  { id: "seed-4", name: "DickVigarista",     position: 4, timeSec: 291, timeStr: "04:51", score: 950,  correct: 6, bestLap: 55 },
+  { id: "seed-5", name: "CComp",             position: 5, timeSec: 300, timeStr: "05:00", score: 820,  correct: 5, bestLap: 58 }
+];
+
 // Armazenamento em memória (fallback quando não há KV configurado).
-let memory = [];
+// null = nunca inicializado (recebe o seed no primeiro acesso).
+let memory = null;
 
 const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || "";
 const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || "";
@@ -42,10 +54,17 @@ async function redis(cmd) {
 }
 
 async function readRanking() {
-  if (!hasKV) return memory.slice();
+  if (!hasKV) {
+    if (memory === null) memory = SEED.slice();
+    return memory.slice();
+  }
   try {
     const data = await redis(["GET", REDIS_KEY]);
-    if (!data || data.result == null) return [];
+    if (!data || data.result == null) {
+      // Chave inexistente: ranking nunca foi gravado -> semeia o Top 5.
+      await writeRanking(SEED);
+      return SEED.slice();
+    }
     return JSON.parse(data.result);
   } catch (e) {
     return [];
@@ -57,9 +76,12 @@ async function writeRanking(list) {
   await redis(["SET", REDIS_KEY, JSON.stringify(list)]);
 }
 
-// Ordena: 1º posição (asc), 2º tempo total (asc).
+// Ordena: 1º pontuação (desc), 2º posição (asc), 3º tempo total (asc).
 function sortList(list) {
   return list.sort((a, b) => {
+    const scoreA = Number(a.score) || 0;
+    const scoreB = Number(b.score) || 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
     if (a.position !== b.position) return a.position - b.position;
     return a.timeSec - b.timeSec;
   });
