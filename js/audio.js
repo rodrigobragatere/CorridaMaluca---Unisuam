@@ -1,6 +1,6 @@
 /* ================================================================
    audio.js — Áudio do jogo.
-   - MÚSICA de fundo: faixa MP3 (assets/audio/unisuam.mp3) em loop,
+   - MÚSICA de fundo: faixa MP3 (assets/audio/Turbo na Pista.mp3) em loop,
      tocada na tela inicial e durante a corrida.
    - EFEITOS sintetizados via Web Audio API: motor contínuo, nitro,
      acerto, erro e chegada.
@@ -44,14 +44,14 @@ const GameAudio = (() => {
   }
 
   // -------------------- MÚSICA (faixa MP3 em loop) ----------------
-  // Música de fundo do jogo e da tela inicial: assets/audio/unisuam.mp3.
+  // Música de fundo do jogo e da tela inicial: assets/audio/Turbo na Pista.mp3.
   let music = null;
   let musicLevel = 0.6; // nível relativo da música (0..1)
 
   // Cria o elemento de áudio (independe do AudioContext).
   function ensureMusic() {
     if (music) return;
-    music = new Audio("assets/audio/unisuam.mp3");
+    music = new Audio("assets/audio/Turbo na Pista.mp3");
     music.loop = true;
     music.preload = "auto";
     music.volume = musicLevel * volume;
